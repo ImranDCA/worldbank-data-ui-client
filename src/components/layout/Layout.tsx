@@ -35,7 +35,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   setTheme: (theme: ThemeColors) => dispatch(layoutActions.setTheme(theme))
 })
 
-export const LayoutContainer = connect(
+export const Layout = connect(
   mapStateToProps,
   mapDispatchToProps
 )(LayoutContainer_)

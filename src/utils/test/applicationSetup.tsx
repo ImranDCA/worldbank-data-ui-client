@@ -13,7 +13,16 @@ import { recordViewInitialState } from '../../store/recordView';
 import { searchInitialState } from '../../store/search';
 import { wait } from "./waitUtil";
 
-(window as any).React = React
+(window as any).React = React // needed for jst / jsdom
+
+// declare jest custom matcher toMatchImageSnapshot
+declare global {
+  namespace jest {
+    interface Matchers<R> {
+      toMatchImageSnapshot(): R
+    }
+  }
+}
 
 const REUSE_SAME_WRAPPER = false
 
@@ -48,7 +57,7 @@ export function getInitialApplicationState(history: History): ApplicationState {
     recordView: recordViewInitialState,
     router: {
       location: history.location,
-      action: "REPLACE"
+      action: "PUSH"
     },
     search: searchInitialState
   };
@@ -67,13 +76,18 @@ async function setupApplicationWrapper(): Promise<{
   const initialState: ApplicationState = getInitialApplicationState(history);
   const store = configureStore(history, initialState);
   const app = <Provider store={store}><Main history={history} theme={'light'}></Main></Provider>;
+  const wrapper = attachAndMount(app);
+  return { wrapper, history, initialState, store };
+}
+
+export function attachAndMount(app: JSX.Element) {
   const oldEl = document.getElementById('root-test');
   oldEl && oldEl.remove();
-  document.body.innerHTML = ''
+  document.body.innerHTML = '';
   const rootEl = document.createElement('div');
   rootEl.setAttribute('id', 'root-test');
   document.body.appendChild(rootEl);
   const wrapper = mount(app, { attachTo: rootEl });
-  return { wrapper, history, initialState, store };
+  return wrapper;
 }
 

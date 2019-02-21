@@ -3,7 +3,7 @@ import { asArray, flat } from '../misc';
 import { ElementOrWrapper, asElement, asElements } from "./elementOrWrapper";
 import { text, print } from "./text";
 import { Predicate } from './waitUtil';
-import { find } from './find';
+import { find, findAscendantOrSelf } from './find';
 
 export function expectToContainText(wrapper: ReactWrapper, selector: string, t: string | string[]) {
   const s = text(wrapper, selector);
@@ -42,7 +42,7 @@ function expectExistance(wrapper: ReactWrapper, selectors: string | string[], do
 
 
 export function exists(w: ReactWrapper) {
-  return !!w.getDOMNode() && !!w.getDOMNode().parentElement
+  return !!w.getDOMNode() && !!w.getDOMNode().parentElement //&& !!findAscendantOrSelf(w.getDOMNode().parentElement!, n=>n.tagName.toLowerCase()==='body')
 }
 
 export function expectToHaveLength(l: {

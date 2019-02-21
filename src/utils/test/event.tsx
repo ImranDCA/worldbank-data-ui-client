@@ -41,8 +41,9 @@ export async function value(wrapper: ReactWrapper, value: string) {
 
 async function trigger(wrapper: ReactWrapper, event: string, dontUpdate = false) {
   dontUpdate || wrapper.update();
-  wrapper
-    .filterWhere(w => !!w && !!w.getDOMNode())
+  wrapper.hostNodes()
+    // .filterWhere(w => !!w && !!w.getDOMNode())
+    // find(wrapper)
     .forEach(w => {
       w.simulate(event, {
         ...clickEventAttributes,

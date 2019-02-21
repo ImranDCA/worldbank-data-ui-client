@@ -4,7 +4,7 @@ import { complement, readableColor } from 'polished';
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import { styled } from '../../styles/theme/definition';
-import { LayoutContainer } from './LayoutContainer';
+import { Layout } from './Layout';
 import { Container } from './Container';
 import { jsx, css } from '@emotion/core';
 
@@ -19,34 +19,34 @@ const Header: React.SFC<HeaderProps> = ({ title }) => (
         <Title>{title}</Title>
       </HeaderLeft>
       <HeaderNav className="navbar">
-        <HeaderNavLink className="home" exact to="/" activeClassName={HeaderLinkActive.name}>
+        <HeaderNavLink className="home" exact to="/" activeClassName="active">
           Home
         </HeaderNavLink>
-        <HeaderNavLink className="list-record-types" to="/countryIndicator/{}" activeClassName={HeaderLinkActive.name}>
-          List Types
+        <HeaderNavLink className="country-indicator" to="/countryIndicator/{}" activeClassName="active">
+          Country Indicators
         </HeaderNavLink>
-        <HeaderNavLink className="search" to="/search/{}" activeClassName={HeaderLinkActive.name}>
+        <HeaderNavLink className="search" to="/search/{}" activeClassName="active">
           Search
         </HeaderNavLink>
-        <HeaderNavLink className="example-links" to="/exampleLinks/" activeClassName={HeaderLinkActive.name}>
+        <HeaderNavLink className="example-links" to="/exampleLinks/" activeClassName="active">
           Example Links
         </HeaderNavLink>
 
-        <HeaderNavLink className="record-view" to="/recordView/inventoryitem/465/{}" activeClassName={HeaderLinkActive.name}>
+        <HeaderNavLink className="record-view" to="/recordView/inventoryitem/465/{}" activeClassName="active">
           Record
         </HeaderNavLink>
 
       </HeaderNav>
       <HeaderRight>
-        <LayoutContainer>
+        <Layout>
           {({ theme, setTheme }) => (
             <React.Fragment>
-              <ThemeSwitcherButton onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+              <ThemeSwitcherButton className="switch-theme-button" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
                 Switch to {theme === 'light' ? 'dark' : 'light'} theme
               </ThemeSwitcherButton>
             </React.Fragment>
           )}
-        </LayoutContainer>
+        </Layout>
       </HeaderRight>
     </HeaderInner>
   </Wrapper>
@@ -87,17 +87,19 @@ const HeaderNav = styled('nav')`
   @media (min-width: ${props => props.theme.breakpoints.lg}) {
     margin: 0;
   }
+
+
 `
 
 const HeaderNavLink = styled(NavLink)`
   margin: 0 1rem;
   text-decoration: none;
+  &.active {
+    text-decoration: underline;
+    font-weight: 800;
+  }
 `
 
-const HeaderLinkActive = css`
-  text-decoration: underline;
-  font-weight: 800;
-`
 
 const HeaderRight = styled('div')`
   padding-left: 1rem;

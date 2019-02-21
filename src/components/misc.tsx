@@ -1,12 +1,8 @@
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core'
+import { jsx } from '@emotion/core';
+import { ReactNodeLike } from 'prop-types';
 import * as React from 'react';
-// import styled from '@emotion/styled';
-import { ReactNodeLike, ReactElementLike } from 'prop-types';
-import { LinkProps, Link as RLink } from 'react-router-dom';
-import { encodeOptions } from '../utils/routeUrl/urlOptions';
 import { styled } from '../styles/theme';
-import { Identical } from '../utils/typesUtil';
 
 
 export type Children = ReactNodeLike
@@ -31,15 +27,12 @@ export const Count = (props: Props) =>
 
 export function Link(props: {to: string} & Props) {
   return <a href={`${location.pathname}${location.search}#${props.to}`}>{props.children}</a>
-  // const to = `${props.to}/${encodeOptions(props.options)}`
-  // return <a to={to}>{props.children}</a>
 }
 
 
 export function Js(props: {children: (...args: any[]) => any }) {
   const r = props.children()
   console.log(r);
-
   return r ? <F>{r}</F> : <F></F>
 }
 

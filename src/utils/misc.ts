@@ -43,6 +43,10 @@ export function unique(s = 'unique') {
   return s + uniqueCounter++
 }
 
+export function randomIntBetween(a: number, b: number){
+  return Math.floor(Math.random() * b) + a
+}
+
 
 
 

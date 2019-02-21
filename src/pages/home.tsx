@@ -32,17 +32,4 @@ export default () => (
 )
 
 const PageContent = styled('article')`
-  margin: 0 auto;
-  line-height: 1.6;
-  a {
-    color: ${props => props.theme.colors.brand};
-  }
-  h1,
-  h2,
-  h3,
-  h4 {
-    margin-bottom: 0.5rem;
-    font-family: ${props => props.theme.fonts.headings};
-    line-height: 1.25;
-  }
 `

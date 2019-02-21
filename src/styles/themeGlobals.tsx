@@ -23,9 +23,11 @@ body {
 
 a {
   color: inherit;
+  text-decoration: underline;
   &:hover,
   &:focus {
-    text-decoration: underline;
+    color: ${p.theme.colors.brand};
+    // font-weight: bold;
   }
 }
 
