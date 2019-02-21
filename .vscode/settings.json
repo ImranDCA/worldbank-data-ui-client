@@ -1,0 +1,28 @@
+{
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "files.encoding": "utf8",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "search.exclude": {
+    "**/public": true,
+    "**/.cache": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/test": true,
+    "**/node_modules": true
+  },
+  "files.watcherExclude": {
+    "**/.cache/**": true,
+    "**/build/**": true,
+    "**/dist/**": true,
+    "**/node_modules/**": true,
+    "**/test": true,
+  },
+  "files.exclude": {
+    "**/.cache/**": true,
+    "**/build/**": true,
+    // "**/dist/**": true,
+    // "**/node_modules/**": true
+  }
+}

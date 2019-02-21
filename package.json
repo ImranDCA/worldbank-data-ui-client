@@ -1,0 +1,88 @@
+{
+  "name": "worldbank-data-ui-client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "npm run mock && react-scripts-parcel start",
+    "build": "npx parcel build public/index.html --detailed-report",
+    "test": "npx jest",
+    "test-clean": "npm run clean && npx jest --clearCache && npx jest --no-cache --clearMocks",
+    "clean": "rm -rf build/ dist/ .cache",
+    "test-watch": "npx jest --watch",
+    "eject": "react-scripts-parcel eject",
+    "url": "npx ts-node -P tsconfig-node.json scripts/getNsUrlFromIndex.ts",
+    "mock": "rm -rf dist/ajaxResponseMocks; mkdir -p dist; cp -rf test/ajaxResponseMocks dist"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./scripts/setupTests.js"
+    ]
+  },
+  "browserslist": {
+    "development": [
+      "last 2 chrome versions",
+      "last 2 firefox versions",
+      "last 2 edge versions"
+    ],
+    "production": [
+      "> 5%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all"
+    ]
+  },
+  "dependencies": {
+    "@emotion/core": "^10.0.7",
+    "@emotion/styled": "^10.0.7",
+    "bootstrap": "^4.3.1",
+    "connected-react-router": "^6.3.1",
+    "emotion-theming": "^10.0.7",
+    "history": "^4.7.2",
+    "jquery": "^3.3.1",
+    "polished": "^2.3.3",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.1",
+    "react-bootstrap-table-next": "^2.1.2",
+    "react-bootstrap-table2-editor": "^1.2.2",
+    "react-bootstrap-table2-filter": "^1.1.4",
+    "react-bootstrap-table2-overlay": "^1.0.0",
+    "react-bootstrap-table2-paginator": "^2.0.2",
+    "react-dom": "^16.8.1",
+    "react-redux": "^6.0.0",
+    "react-router-dom": "^4.3.1",
+    "redux": "^4.0.1",
+    "redux-saga": "^1.0.1",
+    "typesafe-actions": "^3.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "@babel/plugin-proposal-class-properties": "^7.3.3",
+    "@babel/plugin-transform-runtime": "^7.2.0",
+    "@babel/preset-env": "^7.3.1",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/enzyme": "^3.1.18",
+    "@types/history": "^4.7.2",
+    "@types/jest": "^24.0.5",
+    "@types/node": "^11.9.4",
+    "@types/react": "^16.8.1",
+    "@types/react-dom": "^16.8.1",
+    "@types/react-redux": "^7.0.1",
+    "@types/react-router": "^4.4.4",
+    "@types/react-router-dom": "^4.3.1",
+    "babel-plugin-emotion": "^10.0.7",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "dotenv-expand": "^4.2.0",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-16": "^1.9.1",
+    "http2": "^3.3.7",
+    "jest": "^24.1.0",
+    "p-map": "^2.0.0",
+    "react-scripts-parcel": "0.0.38",
+    "redux-devtools-extension": "^2.13.8",
+    "tslint": "^5.12.1",
+    "tslint-config-blvd": "^1.2.1",
+    "typescript": "^3.3.3",
+    "whatwg-fetch": "^3.0.0"
+  }
+}
