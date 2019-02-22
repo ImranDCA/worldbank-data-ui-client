@@ -1,10 +1,11 @@
 import { ReactWrapper } from 'enzyme'
-import { text, hasText, HasTextOptions, defaultHasTextOptions } from './text';
+import { text, hasText, HasTextOptions, hasTextOptions } from './text';
+import { SelectorOrPredicate } from './common';
 
 /** @returns HTMLElement of nodes that match `selector` in given wrapper */
 export function find<T extends Element = Element>(
   wrapper: ReactWrapper,
-  selectorOrPredicate?: string | ((w: Element) => boolean)
+  selectorOrPredicate?: SelectorOrPredicate
 ): T[] {
   return ((typeof selectorOrPredicate === 'string' ? wrapper.find(selectorOrPredicate) : wrapper) as ReactWrapper)
     .filterWhere(
@@ -18,8 +19,8 @@ export function find<T extends Element = Element>(
 export function findWithText<T extends Element = Element>(
   wrapper: ReactWrapper,
   s: string,
-  selectorOrPredicate?: string | ((w: Element) => boolean),
-  opts: HasTextOptions= defaultHasTextOptions
+  selectorOrPredicate?: SelectorOrPredicate,
+  opts: HasTextOptions= hasTextOptions
 ): T[] {
   return find(wrapper, selectorOrPredicate).filter(e=>hasText(text(e), s, opts)) as any
 }
@@ -27,14 +28,14 @@ export function findWithText<T extends Element = Element>(
 export function findContainingText<T extends Element = Element>(
   wrapper: ReactWrapper,
   s: string,
-  selectorOrPredicate?: string | ((w: Element) => boolean),
+  selectorOrPredicate?: SelectorOrPredicate,
 ): T[] {
-  return find(wrapper, selectorOrPredicate).filter(e=>hasText(text(e), s, {...defaultHasTextOptions, containing: true})) as any
+  return find(wrapper, selectorOrPredicate).filter(e=>hasText(text(e), s, {...hasTextOptions, containing: true})) as any
 }
 
 export function findOne<T extends Element = Element>(
   wrapper: ReactWrapper,
-  selectorOrPredicate?: string | ((w: Element) => boolean)
+  selectorOrPredicate?: SelectorOrPredicate
 ): T {
   const r = find(wrapper, selectorOrPredicate)
   if (r.length) {
@@ -45,8 +46,8 @@ export function findOne<T extends Element = Element>(
 export function findOneWithText<T extends Element = Element>(
   wrapper: ReactWrapper,
   s: string,
-  selectorOrPredicate?: string | ((w: Element) => boolean),
-  opts: HasTextOptions= defaultHasTextOptions
+  selectorOrPredicate?: SelectorOrPredicate,
+  opts: HasTextOptions= hasTextOptions
 ): T {
   const r = findWithText(wrapper, s, selectorOrPredicate,opts)
   if (r.length) {
@@ -57,7 +58,7 @@ export function findOneWithText<T extends Element = Element>(
 export function findOneContainingText<T extends Element = Element>(
   wrapper: ReactWrapper,
   s: string,
-  selectorOrPredicate?: string | ((w: Element) => boolean)
+  selectorOrPredicate?: SelectorOrPredicate
 ): T {
   const r = findContainingText(wrapper, s, selectorOrPredicate)
   if (r.length) {
@@ -75,3 +76,4 @@ export function findAscendantOrSelf<T extends Element = Element>(
     return findAscendantOrSelf(e.parentElement, p)
   }
 }
+

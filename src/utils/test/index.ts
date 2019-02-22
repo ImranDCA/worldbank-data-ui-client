@@ -8,4 +8,5 @@ export * from './find'
 export * from './waitUtil'
 export * from './snapshot'
 
+export * from './common'
 

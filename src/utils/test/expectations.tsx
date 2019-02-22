@@ -1,9 +1,10 @@
 import { ReactWrapper } from 'enzyme';
-import { asArray, flat } from '../misc';
-import { ElementOrWrapper, asElement, asElements } from "./elementOrWrapper";
-import { text, print } from "./text";
+import { asArray, flat, tryTo } from '../misc';
+import { ElementOrWrapper, asElement, asElements, printElementOrWrapperName } from "./elementOrWrapper";
+import { text, print, HasTextOptions, hasTextOptions } from "./text";
 import { Predicate } from './waitUtil';
-import { find, findAscendantOrSelf } from './find';
+import { find, findAscendantOrSelf, findOneWithText } from './find';
+import { printselectorOrPredicate, SelectorOrPredicate, printWrapperName } from './common';
 
 export function expectToContainText(wrapper: ReactWrapper, selector: string, t: string | string[]) {
   const s = text(wrapper, selector);
@@ -13,14 +14,6 @@ export function expectToContainText(wrapper: ReactWrapper, selector: string, t: 
 }
 
 export function expectToExist(wrapper: ReactWrapper, selectors?: string | string[]) {
-  // asArray(selectors).forEach(s => {
-  //   if (wrapper.find(s).filterWhere(exists).length) {
-  //     expect(true).toBe(true)
-  //   }
-  //   else {
-  //     fail(`Expected ${selectors} to exists in wrapper`)
-  //   }
-  // });
   expectExistance(wrapper, selectors || [])
 }
 
@@ -41,9 +34,9 @@ function expectExistance(wrapper: ReactWrapper, selectors: string | string[], do
 
 
 
-export function exists(w: ReactWrapper) {
-  return !!w.getDOMNode() && !!w.getDOMNode().parentElement //&& !!findAscendantOrSelf(w.getDOMNode().parentElement!, n=>n.tagName.toLowerCase()==='body')
-}
+// export function exists(w: ReactWrapper) {
+//   return !!w.getDOMNode() && !!w.getDOMNode().parentElement
+// }
 
 export function expectToHaveLength(l: {
   length: number;
@@ -55,6 +48,8 @@ export function expectToHaveLength(l: {
     expect(l.length).toBe(c);
   }
 }
+
+
 
 export function expectAttributeToBe(w: ElementOrWrapper, name: string, value: string | null | boolean | Predicate, msg = '', useAccessor = false) {
   let fn: ((v: any) => boolean) = (typeof value !== 'function') ? v => v === value : value
@@ -79,12 +74,59 @@ export function expectCheckedToBe(w: ElementOrWrapper, checked: boolean, msg = '
   function nullAttr(value: any) {
     return value === null || value === undefined
   }
-  // const v = value=>checked ? value : (value===null||value==='')
-  // const v: Predicate = checked ? (value=>(typeof value === 'string' && !!value)) : (value=> !value);
   const v: Predicate = checked ? (value => !nullAttr(value)) : (value => nullAttr(value));
-
   return expectAttributeToBe(w, 'checked', v, msg || `expected element ${print(w)} ${checked ? '' : 'not'} to be checked. ${msg}`)
 }
 
-// export function isChecked(w:)
+export interface ExpectSelectionOptions{
+  containPredicate?: 'one'|'all'|'noneOf'|'exactly'
+}
+export function expectSelection(w: ElementOrWrapper, values:string[]|string, msg = '', opts: ExpectSelectionOptions={containPredicate: 'all'}) {
+
+  let valid=''
+  const v = asArray(values)
+  const e = asElement<HTMLSelectElement>(w)
+  if(e){
+    const select = e.querySelector<HTMLSelectElement>('select')
+    if(select){
+      const match = Array.from(select.selectedOptions).filter(o=>v.find(vv=>vv===o.value)).map(o=>o.value)
+      if(opts.containPredicate==='exactly'|| !opts.containPredicate){
+        valid= match.length===v.length ?  '': `Expected selection to have exactly these values [${v.join(',')}] but found these [${match.join(',')}]`
+      }
+      else if(opts.containPredicate==='all' ){
+        valid= match.length>=v.length ?  '': `Expected selection to have all these values [${v.join(',')}] but found these [${match.join(',')}]`
+      }
+
+      else if(opts.containPredicate==='one'){
+        valid= match.length>0? '': `Expected selection to have some these values [${v.join(',')}] but found these [${match.join(',')}]`
+      }
+      else if(opts.containPredicate==='noneOf'){
+        valid= match.length===0? '': `Expected selection NOT to have any of these values [${v.join(',')}] but found these [${match.join(',')}]`
+      }
+    }
+    else {
+      fail(`Expected to find a <select> in ${printElementOrWrapperName(w)}` )
+    }
+  }
+  else {
+    fail(`Èxpected  ${printElementOrWrapperName(w)} not to be empty`)
+  }
+  expect(valid).toBe('')
+  // tryTo(()=>findOne<HTMLSelectElement>(w.find('select'))).selectedOptions
+}
+
+export function expectText(w: ReactWrapper, s: string,
+  selectorOrPredicate?: SelectorOrPredicate, opts: HasTextOptions = hasTextOptions) {
+    const e = tryTo(()=>findOneWithText(w, s, selectorOrPredicate, opts))
+    if(!e && !opts.negate || e && opts.negate){
+      fail(`Expected to find an element ${opts.negate ? 'NOT' : ''} with text "${s}" in element "${printWrapperName(w)}" ${printselectorOrPredicate(selectorOrPredicate)}`)
+    }
+    else {
+      expect(true).toBe(true)
+    }
+}
+export function expectNotText(w: ReactWrapper, s: string,
+  selectorOrPredicate?: SelectorOrPredicate, opts: HasTextOptions = hasTextOptions) {
+    return expectText(w, s, selectorOrPredicate, {...opts, negate: true})
+}
 

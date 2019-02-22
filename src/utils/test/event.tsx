@@ -1,6 +1,8 @@
 import { ReactWrapper } from 'enzyme';
 import { wait } from ".";
 import { asElement, ElementOrWrapper } from './elementOrWrapper';
+import { query } from '../html';
+import { asArray } from '../misc';
 
 export async function click(wrapper: ReactWrapper, dontUpdate = false) {
   return trigger(wrapper, 'click', dontUpdate);
@@ -23,15 +25,41 @@ export async function check(wrapper: ReactWrapper, checked: boolean) {
   await change(wrapper);
 }
 
-export async function select(w: ElementOrWrapper, value: string): Promise<void> {
+export async function select(w: ReactWrapper, values: string[]|string) {
+  w.update()
   const e = asElement<HTMLSelectElement>(w)
+  const vals = asArray(values)
+  if (!e) { return }
+  const allOptions = query<HTMLOptionElement>('option')
+  const options = allOptions.filter(o=>vals.includes(o.value))
+  if (options.length===0) {
+  console.warn(`No select option with value [${vals.join(',')}] not found`);
+    return
+  }
+  allOptions.forEach(o=>o.selected=false)
+  options.forEach(option=>{
+    option.selected = true
+  })
+
+  await change(w);
+}
+export async function selectOne(w: ElementOrWrapper, value: string): Promise<void> {
+  const e = asElement<HTMLSelectElement>(w)
+
   if (!e) { return }
   const option = e.querySelector<HTMLOptionElement>(`[value="${value}"]`)
-  if (!option) { return }
+  if (!option) {
+  console.warn(`select() option [value="${value}"] not found`);
+
+    return
+  }
   Array.from( e.querySelectorAll('option')).forEach(o=>o.selected=false)
   option.selected = true
   e.selectedIndex = option.index
   e.value = option.value
+
+  e.dispatchEvent(new Event('change'));
+  await wait(100)
 }
 
 export async function value(wrapper: ReactWrapper, value: string) {

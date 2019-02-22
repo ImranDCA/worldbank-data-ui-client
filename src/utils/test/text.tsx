@@ -83,13 +83,15 @@ export interface HasTextOptions {
   caseSensitive?: boolean
   containing?: boolean
   trim?: boolean
+  negate?: boolean
 }
-export const defaultHasTextOptions: HasTextOptions = {
+export const hasTextOptions: HasTextOptions = {
   caseSensitive: false,
   containing: false,
-  trim: true
+  trim: true,
+  negate: false
 }
-export function hasText(s1: string, s2: string, opts: HasTextOptions=defaultHasTextOptions) {
+export function hasText(s1: string, s2: string, opts: HasTextOptions=hasTextOptions) {
 if(!opts.caseSensitive){
   s1=s1.toLowerCase()
   s2 = s2.toLowerCase()
@@ -99,9 +101,9 @@ if(!opts.trim){
   s2 = s2.trim()
 }
 if(opts.containing){
-  return s1.includes(s2)
+  return opts.negate ? !s1.includes(s2) : s1.includes(s2)
 }
 else {
-  return s1===s2
+  return opts.negate ? s1!==s2 : s1===s2
 }
 }

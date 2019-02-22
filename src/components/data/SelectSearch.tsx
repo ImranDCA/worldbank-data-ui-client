@@ -12,7 +12,7 @@ export interface SelectSearchFetchResult {
   options: Option[],
   search: Required<SelectSearchFetchOptions>&{ pages: number, total: number }
 }
-interface Option { name?: string, value: string }
+export interface Option { name?: string, value: string }
 interface Props {
   fetch?(options: SelectSearchFetchOptions): Promise<SelectSearchFetchResult>
   multiple?: boolean
@@ -65,7 +65,11 @@ export class SelectSearch extends React.Component<Props, State> {
         </div>
       }</If>
 
-      <select>
+      <select onChange={e=>{
+        const selected = Array.from(e.currentTarget.selectedOptions).map(e=>e.value)
+        const selectedOptions = (this.props.options||[]).filter(o=>selected.includes(o.value))
+        this.props.onSelect(selectedOptions)
+      }}>
         <If<Option> c={this.props.defaultOption}>{option =>
           <option value={option.value}>{option.name || option.value}</option>
         }</If>

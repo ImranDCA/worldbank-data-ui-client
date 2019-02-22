@@ -1,4 +1,4 @@
-import { expectToBeVisible, expectToNotExist, getApplicationWrapper, select, wait } from "../../../utils/test";
+import { expectToBeVisible, expectToNotExist, getApplicationWrapper, selectOne, wait } from "../../../utils/test";
 import { navigate } from '../../../utils/test/history';
 
 describe('CountryIndicator', () => {

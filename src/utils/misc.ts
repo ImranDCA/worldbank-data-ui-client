@@ -102,4 +102,3 @@ export function repeat(n: number, s: string): string {
 export function indent(i: number = 1, tabSize = 2): string {
   return repeat(i * tabSize, ' ')
 }
-
