@@ -17,7 +17,8 @@
   "jest": {
     "setupFilesAfterEnv": [
       "./scripts/setupTests.js"
-    ]
+    ],
+    "testEnvironment": "jest-environment-jsdom-thirteen"
   },
   "browserslist": {
     "development": [
@@ -79,6 +80,7 @@
     "enzyme-adapter-react-16": "^1.9.1",
     "http2": "^3.3.7",
     "jest": "^24.1.0",
+    "jest-environment-jsdom-thirteen": "0.0.3",
     "jest-image-snapshot": "^2.8.1",
     "jsdom-screenshot": "file:../jsdom-screenshot",
     "p-map": "^2.0.0",

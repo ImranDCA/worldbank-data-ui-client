@@ -5,6 +5,7 @@ export const Container = styled('div')`
   margin: 0 auto;
   width: 100%;
   max-width: 100%;
+
   & > div .container-overflow-x{
     overflow-x: scroll;
   }
@@ -22,6 +23,7 @@ export const Container = styled('div')`
   & > div .container-overflow-x:hover, & > div .container-overflow-x:focus {
     overflow-x: scroll;
   }
+
 
   `}
 

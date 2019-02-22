@@ -1,26 +1,19 @@
 import { ReactWrapper } from 'enzyme'
 import { findOne } from '../../utils/test/'
+import { unique } from '../misc'
 const { generateImage } = require('jsdom-screenshot')
 
-export async function expectToMatchSnapshot(wrapper: ReactWrapper) {
-  const target = findOne(wrapper)
-  // debugger
-  // const b = el.getBoundingClientRect()
-  // console.log(b);
-  // const clip = {x: b.left+10, y: b.top+10, width: b.width-10, height: b.height}
-  // const clip = {x: 10, y:19, width: 40, height: 50}
-  // const options = {screenshot: {clip}}
-  await expect(await generateImage({ target })).toMatchImageSnapshot()
+export async function expectToMatchSnapshot(wrapperOrSelector?: ReactWrapper | string) {
+  let options: any = {
+    serve: false
+  }
+  if (wrapperOrSelector && typeof wrapperOrSelector !== 'string') {
+    const key = unique()
+    findOne(wrapperOrSelector).setAttribute('data-expect-to-match-snapshot', key)
+    options = { ...options, targetSelector: `[data-expect-to-match-snapshot="${key}"]` }
+  } else if (typeof wrapperOrSelector === 'string') {
+    options = { ...options, targetSelector: wrapperOrSelector }
+  }
+  const image = await generateImage(options)
+  await expect(image).toMatchImageSnapshot()
 }
-
-
-
-// if(options.target){
-//   opts.screenshot = options.screenshot || {}
-//   opts.screenshot.clip = {
-//     x: options.target.offsetLeft,
-//     y: options.target.offsetTop,
-//     width: opts.target.offsetWidth,
-//     height: options.target.offsetHeight
-//   }
-// }

@@ -76,9 +76,9 @@ function queryMapWidthCss(theme: Theme): BreakpointBuilder {
       queryMap![type].className = Object.keys(breakpoints).reduce((acc, label) => {
         acc[label] = (...args: any[]) => css(`
 @media (${type}: ${breakpoints[label]}) {
-  ${css(...args)}
+  ${css(...args).styles}
 }
-        `.trim())
+        `)
         // debugger
         return acc
       }, {} as BreakpointBuilder)

@@ -9,12 +9,6 @@ export function array<T=number>(n: number, sample?: T): T[] {
   }
   return a as T[]
 }
-export function repeat(n: number, s: string): string {
-  return array(n, s).join('')
-}
-export function indent(i: number = 1, tabSize = 2): string {
-  return repeat(i * tabSize, ' ')
-}
 export function dedup<T>(a: T[], p: (a: T, b: T) => boolean): T[] {
   return a.reduce((x, y) => x.find(i => p(i, y)) ? x : [...x, y] as T[], [] as T[])
 }
@@ -86,9 +80,9 @@ export class TypedMapImpl<PropTypes extends EmptyObject> implements TypedMap<Pro
 
 export function printNativeError(error: NativeError) {
   return `${error && error.type}, ${error && error.name}
-Cause: ${error && error.message}
-Stack Trace:
-${(error.stack && Array.isArray(error.stack)) ? error.stack.map(s => repeat(2, ' ') + s).join('\n') : error.stack}`
+  Cause: ${error && error.message}
+  Stack Trace:
+  ${(error.stack && Array.isArray(error.stack)) ? error.stack.map(s => repeat(2, ' ') + s).join('\n') : error.stack}`
 }
 
 
@@ -102,4 +96,10 @@ export function unEscapeHtmlAttribute(code: string) {
   return code.replace(/\&quot\;/gmi, '"');
 }
 
+export function repeat(n: number, s: string): string {
+  return array(n, s).join('')
+}
+export function indent(i: number = 1, tabSize = 2): string {
+  return repeat(i * tabSize, ' ')
+}
 

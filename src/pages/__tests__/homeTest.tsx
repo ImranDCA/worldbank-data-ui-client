@@ -1,8 +1,9 @@
-import { expectToBeVisible, getApplicationWrapper, expectToNotExist, print, html } from "../../utils/test/";
+import { expectToBeVisible, getApplicationWrapper, expectToNotExist, print, html, printDocumentHtml } from "../../utils/test/";
 import { expectToMatchSnapshot } from '../../utils/test/snapshot';
 import { navigate } from '../../utils/test/history';
+import { writeFileSync } from 'fs';
 
-describe('home', () => {
+xdescribe('home', () => {
 
   it('/ shows home and match image snapshot', async () => {
     const wrapper = await getApplicationWrapper('/notFound')
@@ -14,7 +15,6 @@ describe('home', () => {
     // w  rapper.update()
     expectToBeVisible(wrapper.find('Page .home'))
     await expectToMatchSnapshot(wrapper.find('Page .home'))
-
     // console.log(html(wrapper.find('Page .home')));
 
   });

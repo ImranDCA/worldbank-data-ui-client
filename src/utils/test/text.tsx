@@ -50,7 +50,8 @@ return data
   }
 
 
-export function printDocumentHtml() {
+export function printDocumentHtml(config?: {stripCssSourceMaps?: boolean}) {
+  config = config || {}
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -62,7 +63,7 @@ export function printDocumentHtml() {
 <link rel="shortcut icon" href="./favicon.ico">
 <title>React + Parcel App</title>
 
-${stripCssSourceMaps(document.head.innerHTML)}
+${config.stripCssSourceMaps ? stripCssSourceMaps(document.head.innerHTML): document.head.innerHTML}
 
 </head>
 
