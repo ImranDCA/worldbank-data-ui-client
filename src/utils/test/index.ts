@@ -6,5 +6,6 @@ export * from './isVisibile'
 export * from './elementOrWrapper'
 export * from './find'
 export * from './waitUtil'
+export * from './snapshot'
 
 

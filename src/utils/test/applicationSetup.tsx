@@ -13,7 +13,7 @@ import { Provider } from 'react-redux';
 import { Store } from 'redux';
 import 'whatwg-fetch';
 import configureStore from '../../main/configureStore';
-import Main from '../../main/main';
+import { Main } from '../../main/main';
 import { ApplicationState } from '../../store';
 import { countryIndicatorInitialState } from '../../store/countryIndicator';
 import { layoutInitialState } from '../../store/layout';
@@ -94,7 +94,7 @@ async function setupApplicationWrapper(): Promise<{
 export function attachAndMount(app: JSX.Element) {
   const oldEl = document.getElementById('root')
   oldEl && oldEl.remove()
-  document.body.innerHTML = ''
+  // document.body.innerHTML = ''
   const rootEl = document.createElement('div')
   rootEl.setAttribute('id', 'root')
   document.body.appendChild(rootEl)

@@ -76,3 +76,32 @@ ${document.body.outerHTML}
 export function html(e: ElementOrWrapper) {
   return asElements(e).map(e=>e.outerHTML).join('\n') || 'undefined'
 }
+
+
+
+export interface HasTextOptions {
+  caseSensitive?: boolean
+  containing?: boolean
+  trim?: boolean
+}
+export const defaultHasTextOptions: HasTextOptions = {
+  caseSensitive: false,
+  containing: false,
+  trim: true
+}
+export function hasText(s1: string, s2: string, opts: HasTextOptions=defaultHasTextOptions) {
+if(!opts.caseSensitive){
+  s1=s1.toLowerCase()
+  s2 = s2.toLowerCase()
+}
+if(!opts.trim){
+  s1=s1.trim()
+  s2 = s2.trim()
+}
+if(opts.containing){
+  return s1.includes(s2)
+}
+else {
+  return s1===s2
+}
+}

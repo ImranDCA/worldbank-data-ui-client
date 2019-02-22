@@ -4,7 +4,7 @@ import { createHashHistory } from 'history'
 
 import { Provider } from 'react-redux';
 
-import Main from './main'
+import {Main} from './main'
 import configureStore from './configureStore'
 
 import './indexLoadLibraries'

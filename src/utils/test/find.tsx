@@ -1,5 +1,5 @@
 import { ReactWrapper } from 'enzyme'
-import { exists } from './expectations'
+import { text, hasText, HasTextOptions, defaultHasTextOptions } from './text';
 
 /** @returns HTMLElement of nodes that match `selector` in given wrapper */
 export function find<T extends Element = Element>(
@@ -15,14 +15,54 @@ export function find<T extends Element = Element>(
     .map(n => n.getDOMNode()) as any
 }
 
+export function findWithText<T extends Element = Element>(
+  wrapper: ReactWrapper,
+  s: string,
+  selectorOrPredicate?: string | ((w: Element) => boolean),
+  opts: HasTextOptions= defaultHasTextOptions
+): T[] {
+  return find(wrapper, selectorOrPredicate).filter(e=>hasText(text(e), s, opts)) as any
+}
+
+export function findContainingText<T extends Element = Element>(
+  wrapper: ReactWrapper,
+  s: string,
+  selectorOrPredicate?: string | ((w: Element) => boolean),
+): T[] {
+  return find(wrapper, selectorOrPredicate).filter(e=>hasText(text(e), s, {...defaultHasTextOptions, containing: true})) as any
+}
+
 export function findOne<T extends Element = Element>(
   wrapper: ReactWrapper,
-  selector?: string | ((w: Element) => boolean)
+  selectorOrPredicate?: string | ((w: Element) => boolean)
 ): T {
-  const r = find(wrapper, selector)
+  const r = find(wrapper, selectorOrPredicate)
   if (r.length) {
     return r[0] as any
-  } else throw new Error('Cannot find ' + selector)
+  } else throw new Error('Cannot find ' + selectorOrPredicate)
+}
+
+export function findOneWithText<T extends Element = Element>(
+  wrapper: ReactWrapper,
+  s: string,
+  selectorOrPredicate?: string | ((w: Element) => boolean),
+  opts: HasTextOptions= defaultHasTextOptions
+): T {
+  const r = findWithText(wrapper, s, selectorOrPredicate,opts)
+  if (r.length) {
+    return r[0] as any
+  } else throw new Error('Cannot find ' + selectorOrPredicate)
+}
+
+export function findOneContainingText<T extends Element = Element>(
+  wrapper: ReactWrapper,
+  s: string,
+  selectorOrPredicate?: string | ((w: Element) => boolean)
+): T {
+  const r = findContainingText(wrapper, s, selectorOrPredicate)
+  if (r.length) {
+    return r[0] as any
+  } else throw new Error('Cannot find ' + selectorOrPredicate)
 }
 
 export function findAscendantOrSelf<T extends Element = Element>(

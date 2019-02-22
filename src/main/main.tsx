@@ -25,7 +25,7 @@ interface OwnProps {
 
 type AllProps = PropsFromState & PropsFromDispatch & OwnProps
 
-export class Main extends React.Component<AllProps> {
+class MainComponent extends React.Component<AllProps> {
   public render() {
     const { history, theme } = this.props
 
@@ -56,7 +56,7 @@ const mapStateToProps = ({ layout }: ApplicationState) => ({
   theme: layout.theme
 })
 
-export default connect<PropsFromState, PropsFromDispatch, OwnProps, ApplicationState>(
+export const Main =  connect<PropsFromState, PropsFromDispatch, OwnProps, ApplicationState>(
   mapStateToProps
-)(Main)
+)(MainComponent)
 
