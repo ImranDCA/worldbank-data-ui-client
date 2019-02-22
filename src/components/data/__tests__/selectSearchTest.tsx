@@ -1,9 +1,8 @@
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { attachAndMount, findOne, wait, waitFor, findOneContainingText, expectText, selectOne, expectSelection, select } from '../../../utils/test'
-import { SelectSearch, SelectSearchFetchOptions, SelectSearchFetchResult, Option } from '../SelectSearch'
 import { randomIntBetween } from '../../../utils/misc'
-import renderer from 'react-test-renderer'
+import { attachAndMount, expectSelection, expectText, findOneContainingText, select, wait, waitFor, html, asElement } from '../../../utils/test'
+import { Option, SelectSearch, SelectSearchFetchOptions, SelectSearchFetchResult } from '../SelectSearch'
 
 describe('selectSearch', () => {
   let s: ReactWrapper
@@ -72,32 +71,40 @@ describe('selectSearch', () => {
     })
   })
 
-  describe('onSelect', () => {
+  describe('onSelect multiple', () => {
     it('should callback on select one', async () => {
       const onSelect = jest.fn(async function(options: Option[]): Promise<any> {
         await wait(randomIntBetween(1, 20))
         return options
       })
+      const foo={ value: 'foo', name: 'Foo' }
+      const bar = { value: 'bar', name: 'Bar' }
       s = attachAndMount(
         <SelectSearch
-          defaultOption={{ value: '__empty__', name: 'please select an option' }}
-          options={[{ value: 'foo', name: 'Foo' }, { value: 'bar', name: 'Bar' }]}
+          multiple={true}
+          defaultOption={{ value: 'EMPTY', name: 'please select an option' }}
+          options={[foo, bar]}
           onSelect={onSelect}
         />
       )
-      expectSelection(s, '__empty__')
+      expectSelection(s, 'EMPTY')
       expect(onSelect).toBeCalledTimes(0)
 
       await select(s.find('select'), 'foo')
       expectSelection(s, 'foo')
 
       expect(onSelect).toBeCalledTimes(1)
-      expect(onSelect).toBeCalledWith([{value: 'foo', name: 'Foo'}])
+      expect(onSelect).toBeCalledWith([foo])
 
       await select(s.find('select'), 'bar')
       expectSelection(s, 'bar')
       expect(onSelect).toBeCalledTimes(2)
-      expect(onSelect).toBeCalledWith([{value: 'bar', name: 'Bar'}])
+      expect(onSelect).toBeCalledWith([bar])
+
+      await select(s.find('select'), ['foo', 'bar'])
+      expectSelection(s, ['foo', 'bar'])
+      expect(onSelect).toBeCalledTimes(3)
+      expect(onSelect).toBeCalledWith([foo,bar])
 
       s.detach()
     })

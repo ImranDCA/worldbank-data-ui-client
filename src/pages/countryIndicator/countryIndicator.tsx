@@ -1,29 +1,39 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { connect } from 'react-redux';
-import { RouteComponentProps } from 'react-router';
-import { withRouter } from 'react-router-dom';
-import { Dispatch } from 'redux';
-import { ErrorComponent } from '../../components/data/errorComponent';
-import { Loading } from '../../components/data/Loading';
-import { SearchResults } from '../../components/data/searchResults/searchResults';
-import { Container } from '../../components/layout/Container';
-import { Page } from '../../components/layout/Page';
-import { If, NoWrap, Count } from '../../components/misc';
-import { OptionsUrlComponent } from '../../components/optionsUrlComponent';
-import { ApplicationState, ConnectedReduxProps } from '../../store';
-import { ErrorOptions, ResultPagination, PaginationOptions, Result, Country } from '../../store/commonTypes';
-import { FetchCountryOptions as FetchCountriesOptions, CountryResult, IndicatorResult, SourceResult, FetchSourceOptions as FetchSourcesOptions } from '../../store/countryIndicator';
-import { fetchCountries, fetchSources } from '../../store/countryIndicator/actions';
-import { ToolBox } from '../../components/toolBox';
+import { css, jsx } from '@emotion/core'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import { withRouter } from 'react-router-dom'
+import { Dispatch } from 'redux'
+import { ErrorComponent } from '../../components/data/errorComponent'
+import { Loading } from '../../components/data/Loading'
+import { SearchResults } from '../../components/data/searchResults/searchResults'
+import { Container } from '../../components/layout/Container'
+import { Page } from '../../components/layout/Page'
+import { If, NoWrap, Count } from '../../components/misc'
+import { OptionsUrlComponent } from '../../components/optionsUrlComponent'
+import { ApplicationState, ConnectedReduxProps } from '../../store'
+import { ErrorOptions, ResultPagination, PaginationOptions, Result, Country } from '../../store/commonTypes'
+import {
+  FetchCountryOptions,
+  CountryResult,
+  IndicatorResult,
+  SourceResult,
+  FetchSourceOptions,
+  FetchIndicatorsOptions
+} from '../../store/countryIndicator'
+import { fetchCountries, fetchSources, fetchIndicators } from '../../store/countryIndicator/actions'
+import { ToolBox } from '../../components/toolBox'
+import { SelectSearch } from '../../components/data/SelectSearch'
+import { styled } from '../../styles/theme'
+import { minWidth } from '../../styles/media';
 
 interface PropsFromState {
   loading?: boolean
-  source?: string
+  countries?: string[]
+  indicators?: string[]
+  sources?: string[]
   sourceResults?: SourceResult
-  country?: string
   countryResults?: CountryResult
-  indicator?: string
   indicatorResults?: IndicatorResult
   error?: ErrorOptions
 }
@@ -31,6 +41,7 @@ interface PropsFromState {
 interface PropsFromDispatch {
   fetchCountries: typeof fetchCountries
   fetchSources: typeof fetchSources
+  fetchIndicators: typeof fetchIndicators
 }
 
 interface RouteParams {
@@ -38,16 +49,15 @@ interface RouteParams {
 }
 
 interface State extends Partial<PaginationOptions> {
-  country?: string
-  indicator?: string
-  source?: string
+  countries?: string[]
+  indicators?: string[]
+  sources?: string[]
   dontAutoApply?: boolean
 }
 
 type AllProps = PropsFromState & PropsFromDispatch & ConnectedReduxProps & RouteComponentProps<RouteParams>
 
 class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, State> {
-
   constructor(p: AllProps, s: State) {
     super(p, s)
     this.state = {
@@ -55,149 +65,159 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
     }
   }
 
-  async componentWillMount(){
+  async componentWillMount() {
     await super.componentWillMount()
-    if(!this.props.countryResults) {
+    if (!this.props.countryResults) {
       await this.executeActionForNewOptions(this.state)
     }
   }
   protected async executeActionForNewOptions(newOptions: State) {
+    const options = {
+      ...newOptions,
+      per_page: newOptions.per_page || this.state.per_page || 50,
+      page: newOptions.page || this.state.page || 1
+    }
     if (!this.props.sourceResults) {
-      this.props.fetchSources({
-        ...newOptions,
-        per_page: newOptions.per_page || this.state.per_page || 50,
-        page: newOptions.page || this.state.page || 1,
-      })
+      this.props.fetchSources(options)
     }
-    if (!this.props.countryResults) {
-      this.props.fetchCountries({
-        ...newOptions,
-        per_page: newOptions.per_page || this.state.per_page || 50,
-        page: newOptions.page || this.state.page || 1,
-      })
+    else if(options.sources && options.sources.length) {
+      if (!this.props.countryResults) {
+        this.props.fetchCountries({...options, source: options.sources[0]})
+      }
+      if (!this.props.indicatorResults) {
+        this.props.fetchIndicators({...options, source: options.sources[0]})
+      }
     }
-    // else if(this.props.country){
-    //   debugger
-    // }
+    else {
+      debugger
+    }
   }
 
   getRouteOptionNames(): string[] {
-    return ['country', 'indicator', 'source', 'per_page', 'page', 'dontAutoApply']
+    return ['countries', 'indicators', 'sources', 'per_page', 'page', 'dontAutoApply']
   }
 
   public render() {
+    return (
+      <Page>
+        <GridContainer className="country-indicator">
+          <ToolBox>
+            <ul>
+              <li>
+                <NoWrap>
+                  <label className="seeValues">
+                    <input
+                      type="checkbox"
+                      checked={!this.state.dontAutoApply}
+                      onChange={e => this.setState({ dontAutoApply: !e.currentTarget.checked })}
+                    />
+                    Auto Apply?
+                  </label>
+                </NoWrap>
+              </li>
+            </ul>
+          </ToolBox>
 
-    return <Page>
-      <Container className="list-record-types">
-        <ToolBox>
-          <ul>
-            <li>
-              <NoWrap><label className="seeValues">
-                <input type="checkbox" checked={!this.state.dontAutoApply}
-                  onChange={e => this.setState({ dontAutoApply: !e.currentTarget.checked })}></input>
-                Auto Apply?
-                    </label>
-              </NoWrap>
-            </li>
-          </ul>
-        </ToolBox>
+          <If<CountryResult> c={this.props.sourceResults}>
+            {sourceResults => {
+              const sources = sourceResults[1]
+              return (
+                <SelectContainer className="select-sources">
+                  <h4>
+                    Sources <Count>{sources.length}</Count>:
+                  </h4>
+                  <SelectSearch
+                    selected={this.state.sources}
+                    defaultOption={{name: 'Select a Source', value: ''}}
+                    onSelect={async sources => {
+                      const source = sources.find(i => i.value!=='')
+                      if(source){
+                        this.setState({ sources:[source.value]  })
+                      }
+                    }}
+                    options={sources.map(c => ({ value: c.id, name: c.name }))}
+                  />
+                </SelectContainer>
+              )
+            }}
+          </If>
 
-        <If<CountryResult> c={this.props.sourceResults}>{sourceResults => {
-        const sources = sourceResults[1]
-        return <div css={css`& h4 {display: inline; margin-left: 1em}`}>
-          <h4>Sources <Count>{sources.length}</Count>: </h4>
-          <select className="select-type" value={this.state.source || ''}
-            onChange={async e => {
-              const source = e.currentTarget.selectedOptions[0].value
-              if (source) {
-                this.setState({ source })
-              }
-            }}>
-            <option value="">Select a source</option>
-            {sources.map(r =>
-              <option value={r.id} key={r.id}>{r.name}</option>
+          <If<CountryResult> c={this.props.countryResults}>
+            {countryResults => {
+              const countries = countryResults[1]
+              return (
+                <SelectContainer className="select-countries">
+                  <h4>
+                    Countries <Count>{countries.length}</Count>:
+                  </h4>
+                  <SelectSearch
+                    selected={this.state.countries}
+                    multiple={true}
+                    onSelect={async countries => {
+                      this.setState({ countries: countries.map(i => i.value) })
+                    }}
+                    options={countries.map(c => ({ value: c.id, name: c.name }))}
+                  />
+                </SelectContainer>
+              )
+            }}
+          </If>
+
+          <If<IndicatorResult> c={this.props.indicatorResults}>
+            {indicatorResults => {
+              const indicators = indicatorResults[1]
+              return (
+                <SelectContainer className="select-indicators">
+                  <h4>
+                    Indicators <Count>{indicators.length}</Count>:
+                  </h4>
+                  <SelectSearch
+                    multiple={true}
+                    selected={this.state.indicators}
+                    onSelect={async indicators => {
+                      this.setState({ indicators: indicators.map(i => i.value) })
+                    }}
+                    options={indicators.map(c => ({ value: c.id, name: c.name }))}
+                  >
+                  </SelectSearch>
+                </SelectContainer>
+              )
+            }}
+          </If>
+
+          {/* <div>
+            <label>
+              Page Size:
+              <input
+                type="number"
+                id="page-size-input"
+                defaultValue={this.state.per_page + ''}
+                onChange={async e => {
+                  if (this.state.dontAutoApply) {
+                    return
+                  }
+                  this.setState({ ...this.state, per_page: e.currentTarget.valueAsNumber })
+                }}
+              />
+            </label>
+          </div> */}
+
+          <If c={this.state.dontAutoApply}>
+            {() => (
+              <button
+                onClick={e => {
+                  this.updateStateWithUI()
+                }}
+              >
+                Apply
+              </button>
             )}
-          </select>
-        </div>}}</If>
+          </If>
 
-        <If<CountryResult> c={this.props.countryResults}>{countryResults => {
-        const countries = countryResults[1]
-        return <div css={css`& h4 {display: inline; margin-left: 1em}`}>
-          <h4>Countries <Count>{countries.length}</Count>: </h4>
-          <select className="select-type" value={this.state.country || ''}
-            onChange={async e => {
-              const country = e.currentTarget.selectedOptions[0].value
-              if (country) {
-                this.setState({ country })
-              }
-            }}>
-            <option value="">Select a Country</option>
-            {countries.map(r =>
-              <option value={r.id} key={r.id}>{r.name}</option>
-            )}
-          </select>
-        </div>}}</If>
-
-        <If<IndicatorResult> c={this.props.indicatorResults} >{indicatorResults => {
-          const indicators = indicatorResults[1]
-        return <div css={css`& h4 {display: inline; margin-left: 1em}`}>
-          <h4>Indicators. <Count>{indicators.length}</Count>: </h4>
-          <select className="select-type" value={this.state.country || ''}
-            onChange={async e => {
-              const indicator = e.currentTarget.selectedOptions[0].value
-              if (indicator) {
-                this.setState({ indicator })
-              }
-            }}>
-            <option value="">Select a Country</option>
-            {indicators.map(r =>
-              <option value={r.id} key={r.id}>{r.name}</option>
-            )}
-          </select>
-        </div>}}</If>
-
-
-        {/* <If<SearchColumn[]> c={this.state.type && columns}>{columns =>
-
-          <div>
-            <h4>Columns <Count>{columns.length}</Count>: </h4>
-            <ColumnSelect id="columns-select" multiple={true} defaultValue={this.state.userColumns}
-              onChange={e => {
-                if (this.state.dontAutoApply) {
-                  return
-                }
-                this.updateStateWithUI();
-              }}>
-              <option>Select a Column</option>
-              {columns.map(c =>
-                <option value={c.id} key={c.id}>{c.id} ({c.label})</option>)
-              }
-            </ColumnSelect>
-          </div>}</If> */}
-
-          <div>
-              <label>Page Size:
-                    <input type="number" id="page-size-input" defaultValue={this.state.per_page + ''}
-                  onChange={async e => {
-                    if (this.state.dontAutoApply) {
-                      return
-                    }
-                    this.setState({ ...this.state, per_page: e.currentTarget.valueAsNumber })
-                  }}>
-                </input>
-              </label>
-            </div>
-
-          <If c={this.state.dontAutoApply}>{() =>
-              <button onClick={e => {
-                this.updateStateWithUI()
-              }}>Apply</button>
-            }</If>
-
-        <If c={!this.props.error}>{() =>
-          <Loading {...this.props}>
-
-            {/* <If<CountryResult[]> c={this.props.countryResults}>{results => {
+          <If c={!this.props.error}>
+            {() => (
+              <Loading {...this.props}>
+                {/* <If<CountryResult[]> c={this.props.countryResults}>{results => {
               // const formattedResults = results.map(r => {
               //   const resultColumns = this.props.resultColumns || this.state.userColumns
               //   if (!resultColumns || !this.state.userColumns) {
@@ -216,14 +236,13 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
               //   results={formattedResults} columns={columns!} />
               return <div>countries {results.length}</div>
             }}</If> */}
-          </Loading>
-        }</If>
-        <If<ErrorOptions> c={this.props.error}>{error =>
-          <ErrorComponent {...error} />
-        }</If>
-      </Container>
-    </Page >
-
+              </Loading>
+            )}
+          </If>
+          <If<ErrorOptions> c={this.props.error}>{error => <ErrorComponent {...error} />}</If>
+        </GridContainer>
+      </Page>
+    )
   }
 
   private updateStateWithUI() {
@@ -236,7 +255,6 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
     s.per_page = document.querySelector<HTMLInputElement>('#page-size-input')!.valueAsNumber
     this.setState(s)
   }
-
 }
 
 // const ColumnSelect = styled.select`
@@ -244,24 +262,57 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
 // `
 
 const mapStateToProps = ({ countryIndicator }: ApplicationState): PropsFromState => ({
-  country: countryIndicator.country,
+  countries: countryIndicator.countries,
   countryResults: countryIndicator.countryResults,
-  indicator: countryIndicator.indicator,
+  indicators: countryIndicator.indicators,
   indicatorResults: countryIndicator.indicatorResults,
-  source: countryIndicator.source,
+  sources: countryIndicator.sources,
   sourceResults: countryIndicator.sourceResults,
   loading: countryIndicator.loading,
   // recordTypes: countryIndicator.recordTypes,
-  error: countryIndicator.error,
+  error: countryIndicator.error
   // resultColumns: countryIndicator.resultColumns
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  fetchCountries: (options: FetchCountriesOptions) => dispatch(fetchCountries(options)),
-  fetchSources: (options: FetchSourcesOptions) => dispatch(fetchSources(options))
+  fetchCountries: (options: FetchCountryOptions) => dispatch(fetchCountries(options)),
+  fetchSources: (options: FetchSourceOptions) => dispatch(fetchSources(options)),
+  fetchIndicators: (options: FetchIndicatorsOptions) => dispatch(fetchIndicators(options))
 })
 
-export const CountryIndicator = withRouter(connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CountryIndicatorIndexPage))
+const SelectContainer = styled.div`
+& h4 {
+  display: inline;
+  margin-left: 1em;
+}
+& select {
+  resize: both;
+}
+`
+
+const GridContainer = styled(Container)`
+
+`
+
+// ${props=>minWidth(props).md`
+// display: grid;
+// grid-template-columns: repeat(3, 1fr);
+// grid-gap: 10px;
+// grid-auto-rows: minmax(100px, auto);
+// .select-countries {
+//   grid-column: 1 / 3;
+// }
+// .select-sources {
+//   grid-column: 2 / 3;
+// }
+// .select-indicators {
+//   grid-column: 3 / 3;
+// }
+// `}
+
+export const CountryIndicator = withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(CountryIndicatorIndexPage)
+)

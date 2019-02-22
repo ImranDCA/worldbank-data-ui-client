@@ -1,6 +1,6 @@
 import { action } from 'typesafe-actions'
 
-import { CountryIndicatorActionTypes, CountryResult, FetchCountryOptions as FetchCountriesOptions, ShowCountriesOptions, FetchSourceOptions, ShowSourcesOptions } from './types'
+import { CountryIndicatorActionTypes, CountryResult, FetchCountryOptions as FetchCountriesOptions, ShowCountriesOptions, FetchSourceOptions, ShowSourcesOptions, FetchIndicatorsOptions, ShowIndicatorsOptions } from './types'
 import { ResponseError, Result } from '../commonTypes';
 export const fetchRequest = () => action(CountryIndicatorActionTypes.FETCH_REQUEST)
 
@@ -19,6 +19,15 @@ export const fetchSources = (options: FetchSourceOptions) => {
 }
 export const showSources = (options: ShowSourcesOptions) => {
   return action(CountryIndicatorActionTypes.SHOW_SOURCES, options)
+}
+
+
+
+export const fetchIndicators = (options: FetchIndicatorsOptions) => {
+  return action(CountryIndicatorActionTypes.FETCH_INDICATORS, options)
+}
+export const showIndicators = (options: ShowIndicatorsOptions) => {
+  return action(CountryIndicatorActionTypes.SHOW_INDICATORS, options)
 }
 
 

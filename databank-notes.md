@@ -6,6 +6,12 @@
 
 ## useful
 
+ * which series apply to a source: https://api.worldbank.org/v2/sources/11/series
+ * which countries apply to a source: https://api.worldbank.org/v2/sources/11/country
+ * query data for 1 source, and multiple countries and series: https://api.worldbank.org/v2/sources/57/country/USA;ARG/series/ER.GDP.FWTL.M3.KD;SH.DYN.AIDS.FE.ZS/time/all/version/201404/data?mrv=7&gapfill=Y
+
+
+### old
  * use mrv and gapfill to query exactly N results and with non empty values. (Doesnt work with page and per_page)
  https://api.worldbank.org/v2/sources/57/country/USA/series/ER.GDP.FWTL.M3.KD;SH.DYN.AIDS.FE.ZS/time/all/version/201404/data?mrv=7&gapfill=Y
  * if gapfill is not used then time and version are very important - you cannot query data on a date greater than the version.

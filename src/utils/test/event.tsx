@@ -37,30 +37,33 @@ export async function select(w: ReactWrapper, values: string[]|string) {
     return
   }
   allOptions.forEach(o=>o.selected=false)
+
   options.forEach(option=>{
     option.selected = true
   })
-
   await change(w);
+  // await wait(10)
+
+  // console.log(e.outerHTML);
 }
-export async function selectOne(w: ElementOrWrapper, value: string): Promise<void> {
-  const e = asElement<HTMLSelectElement>(w)
+// export async function selectOne(w: ElementOrWrapper, value: string): Promise<void> {
+//   const e = asElement<HTMLSelectElement>(w)
 
-  if (!e) { return }
-  const option = e.querySelector<HTMLOptionElement>(`[value="${value}"]`)
-  if (!option) {
-  console.warn(`select() option [value="${value}"] not found`);
+//   if (!e) { return }
+//   const option = e.querySelector<HTMLOptionElement>(`[value="${value}"]`)
+//   if (!option) {
+//   console.warn(`select() option [value="${value}"] not found`);
 
-    return
-  }
-  Array.from( e.querySelectorAll('option')).forEach(o=>o.selected=false)
-  option.selected = true
-  e.selectedIndex = option.index
-  e.value = option.value
+//     return
+//   }
+//   Array.from( e.querySelectorAll('option')).forEach(o=>o.selected=false)
+//   option.selected = true
+//   e.selectedIndex = option.index
+//   e.value = option.value
 
-  e.dispatchEvent(new Event('change'));
-  await wait(100)
-}
+//   e.dispatchEvent(new Event('change'));
+//   await wait(100)
+// }
 
 export async function value(wrapper: ReactWrapper, value: string) {
   wrapper.getDOMNode().setAttribute('value', value);
