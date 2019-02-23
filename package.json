@@ -12,7 +12,8 @@
     "test-watch": "npx jest --watch",
     "eject": "react-scripts-parcel eject",
     "url": "npx ts-node -P tsconfig-node.json scripts/getNsUrlFromIndex.ts",
-    "mock": "rm -rf dist/ajaxResponseMocks; mkdir -p dist; cp -rf test/ajaxResponseMocks dist"
+    "mock": "rm -rf dist/ajaxResponseMocks; mkdir -p dist; cp -rf test/ajaxResponseMocks dist",
+    "proxy": "npx caching-proxy2 --hostName \"http://api.worldbank.org\" --port 9000"
   },
   "jest": {
     "setupFilesAfterEnv": [
@@ -75,6 +76,7 @@
     "@types/react-test-renderer": "^16.8.1",
     "babel-plugin-emotion": "^10.0.7",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "caching-proxy2": "^0.1.1",
     "dotenv-expand": "^4.2.0",
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-16": "^1.9.1",

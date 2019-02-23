@@ -12,20 +12,23 @@ import { Page } from '../../components/layout/Page'
 import { If, NoWrap, Count } from '../../components/misc'
 import { OptionsUrlComponent } from '../../components/optionsUrlComponent'
 import { ApplicationState, ConnectedReduxProps } from '../../store'
-import { ErrorOptions, ResultPagination, PaginationOptions, Result, Country } from '../../store/commonTypes'
+import { ErrorOptions, ResultPagination, PaginationOptions, Result, Country, ValuedResult } from '../../store/commonTypes'
 import {
   FetchCountryOptions,
   CountryResult,
   IndicatorResult,
   SourceResult,
   FetchSourceOptions,
-  FetchIndicatorsOptions
+  FetchIndicatorsOptions,
+  FetchSearchOptions,
+  SearchResult
 } from '../../store/countryIndicator'
-import { fetchCountries, fetchSources, fetchIndicators } from '../../store/countryIndicator/actions'
+import { fetchCountries, fetchSources, fetchIndicators, fetchSearch } from '../../store/countryIndicator/actions'
 import { ToolBox } from '../../components/toolBox'
 import { SelectSearch } from '../../components/data/SelectSearch'
 import { styled } from '../../styles/theme'
 import { minWidth } from '../../styles/media';
+import { DataTable } from '../../components/data/DataTable';
 
 interface PropsFromState {
   loading?: boolean
@@ -35,6 +38,7 @@ interface PropsFromState {
   sourceResults?: SourceResult
   countryResults?: CountryResult
   indicatorResults?: IndicatorResult
+  searchResults?: SearchResult
   error?: ErrorOptions
 }
 
@@ -42,6 +46,7 @@ interface PropsFromDispatch {
   fetchCountries: typeof fetchCountries
   fetchSources: typeof fetchSources
   fetchIndicators: typeof fetchIndicators
+  fetchSearch: typeof fetchSearch
 }
 
 interface RouteParams {
@@ -67,12 +72,13 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
 
   async componentWillMount() {
     await super.componentWillMount()
-    if (!this.props.countryResults) {
+    // if (!this.props.countryResults || ) {
       await this.executeActionForNewOptions(this.state)
-    }
+    // }
   }
   protected async executeActionForNewOptions(newOptions: State) {
     const options = {
+      // ...this.state,
       ...newOptions,
       per_page: newOptions.per_page || this.state.per_page || 50,
       page: newOptions.page || this.state.page || 1
@@ -88,8 +94,11 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
         this.props.fetchIndicators({...options, source: options.sources[0]})
       }
     }
-    else {
-      debugger
+    if(this.state.sources && this.state.sources.length&&this.state.countries && this.state.countries.length&&this.state.indicators && this.state.indicators.length){
+      const allOptions = {...this.state, ...options}
+      // we assume we must show results
+      // debugger
+        this.props.fetchSearch({...allOptions as any, source: allOptions.sources![0] })
     }
   }
 
@@ -124,7 +133,7 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
               return (
                 <SelectContainer className="select-sources">
                   <h4>
-                    Sources <Count>{sources.length}</Count>:
+                    Sources <Count>{`${(sourceResults as any).total>sources.length && sources.length} / ${(sourceResults as any).total}`}</Count>:
                   </h4>
                   <SelectSearch
                     selected={this.state.sources}
@@ -144,19 +153,21 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
 
           <If<CountryResult> c={this.props.countryResults}>
             {countryResults => {
-              const countries = countryResults[1]
+              const countries: ValuedResult[] = this.getValuesFromResponse(countryResults)
               return (
                 <SelectContainer className="select-countries">
                   <h4>
-                    Countries <Count>{countries.length}</Count>:
+                    Countries <Count>{`${(countryResults as any).total>countries.length && countries.length} / ${(countryResults as any).total}`}</Count>:
                   </h4>
                   <SelectSearch
                     selected={this.state.countries}
                     multiple={true}
                     onSelect={async countries => {
-                      this.setState({ countries: countries.map(i => i.value) })
+                      if(countries.filter(c=>c.value).length){
+                        this.setState({ countries: countries.map(i => i.value) })
+                      }
                     }}
-                    options={countries.map(c => ({ value: c.id, name: c.name }))}
+                    options={countries.map(c => ({ value: c.id, name: c.value }))}
                   />
                 </SelectContainer>
               )
@@ -165,19 +176,21 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
 
           <If<IndicatorResult> c={this.props.indicatorResults}>
             {indicatorResults => {
-              const indicators = indicatorResults[1]
+              const indicators: ValuedResult[] = this.getValuesFromResponse(indicatorResults)
               return (
                 <SelectContainer className="select-indicators">
                   <h4>
-                    Indicators <Count>{indicators.length}</Count>:
+                    Indicators <Count>{`${(indicatorResults as any).total>indicators.length && indicators.length} / ${(indicatorResults as any).total}`}</Count>:
                   </h4>
                   <SelectSearch
                     multiple={true}
                     selected={this.state.indicators}
                     onSelect={async indicators => {
+                      if(indicators.filter(c=>c.value).length){
                       this.setState({ indicators: indicators.map(i => i.value) })
+                      }
                     }}
-                    options={indicators.map(c => ({ value: c.id, name: c.name }))}
+                    options={indicators.map(c => ({ value: c.id, name: c.value }))}
                   >
                   </SelectSearch>
                 </SelectContainer>
@@ -217,25 +230,13 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
           <If c={!this.props.error}>
             {() => (
               <Loading {...this.props}>
-                {/* <If<CountryResult[]> c={this.props.countryResults}>{results => {
-              // const formattedResults = results.map(r => {
-              //   const resultColumns = this.props.resultColumns || this.state.userColumns
-              //   if (!resultColumns || !this.state.userColumns) {
-              //     return r
-              //   }
-              //   r.columns.forEach((s, i) => {
-              //     const name = resultColumns[i]
-              //     if (name) {
-              //       r[name] = s
-              //     }
-              //   })
-              //   return { ...r, columns: undefined }
-              // })
-              // return <SearchResults {...this.props} type={country!}
-              //   userColumns={this.state.userColumns!}
-              //   results={formattedResults} columns={columns!} />
-              return <div>countries {results.length}</div>
-            }}</If> */}
+                <If<SearchResult> c={this.props.searchResults}>{result => {
+             return      <DataTable columns={['country', 'indicator', 'value']}>
+                  {result.result.map(r=><tr><td>{r.variable.find(v=>v.concept.toLowerCase()==='country')!.value}</td><td>{r.variable.find(v=>v.concept.toLowerCase()==='series')!.value}</td> <td>{r.value}</td></tr>)}
+                  </DataTable>
+
+            }}</If>
+            <If c={!this.props.searchResults}>{()=><div>EMPTY RESULTS</div>}</If>
               </Loading>
             )}
           </If>
@@ -243,6 +244,10 @@ class CountryIndicatorIndexPage extends OptionsUrlComponent<AllProps, State, Sta
         </GridContainer>
       </Page>
     )
+  }
+
+  private getValuesFromResponse(response: any): ValuedResult[] {
+    return response.source[0].concept[0].variable//.map(c => ({ value: c.id, name: c.value }));
   }
 
   private updateStateWithUI() {
@@ -268,6 +273,7 @@ const mapStateToProps = ({ countryIndicator }: ApplicationState): PropsFromState
   indicatorResults: countryIndicator.indicatorResults,
   sources: countryIndicator.sources,
   sourceResults: countryIndicator.sourceResults,
+  searchResults: countryIndicator.searchResults,
   loading: countryIndicator.loading,
   // recordTypes: countryIndicator.recordTypes,
   error: countryIndicator.error
@@ -277,7 +283,8 @@ const mapStateToProps = ({ countryIndicator }: ApplicationState): PropsFromState
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   fetchCountries: (options: FetchCountryOptions) => dispatch(fetchCountries(options)),
   fetchSources: (options: FetchSourceOptions) => dispatch(fetchSources(options)),
-  fetchIndicators: (options: FetchIndicatorsOptions) => dispatch(fetchIndicators(options))
+  fetchIndicators: (options: FetchIndicatorsOptions) => dispatch(fetchIndicators(options)),
+  fetchSearch: (options: FetchSearchOptions) => dispatch(fetchSearch(options))
 })
 
 const SelectContainer = styled.div`

@@ -7,7 +7,9 @@ import {
   ShowSourcesOptions,
   FetchSourceOptions,
   FetchIndicatorsOptions,
-  ShowIndicatorsOptions
+  ShowIndicatorsOptions,
+  FetchSearchOptions,
+  ShowSearchOptions
 } from './types'
 // import { getSearchRecordTypes } from '../../nstypes/search';
 import { ErrorOptions } from '../commonTypes'
@@ -46,6 +48,18 @@ const reducer: Reducer<CountryIndicatorState> = (state = countryIndicatorInitial
     case CountryIndicatorActionTypes.SHOW_INDICATORS: {
       const options = action.payload as ShowIndicatorsOptions
       return { ...state, ...options, indicatorResults: options.result, error: undefined, loading: false }
+    }
+
+
+    case CountryIndicatorActionTypes.FETCH_SEARCH: {
+      const options = action.payload as FetchSearchOptions
+      return { ...state, ...options, error: undefined, loading: true }
+    }
+    case CountryIndicatorActionTypes.SHOW_SEARCH: {
+      const options = action.payload as ShowSearchOptions
+      const searchResults = {...options, result: (options as any).source.data}
+      // debugger
+      return { ...state, ...options, searchResults, error: undefined, loading: false }
     }
 
     case CountryIndicatorActionTypes.FETCH_ERROR: {

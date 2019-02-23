@@ -1,4 +1,5 @@
-import { ErrorOptions, ResultPagination, PaginationOptions, Result, Country, Indicator, Source } from '../commonTypes'
+import { ErrorOptions, ResultPagination, PaginationOptions, Result, Country, Indicator, Source, Concept } from '../commonTypes'
+import { read } from 'fs';
 
 export enum CountryIndicatorActionTypes {
   FETCH_COUNTRIES = '@@countryIndicator/FETCH_COUNTRIES',
@@ -9,7 +10,9 @@ export enum CountryIndicatorActionTypes {
   FETCH_SOURCES = '@@countryIndicator/FETCH_SOURCES',
   SHOW_SOURCES = '@@countryIndicator/SHOW_SOURCES',
   FETCH_INDICATORS = '@@countryIndicator/FETCH_INDICATORS',
-  SHOW_INDICATORS = '@@countryIndicator/SHOW_INDICATORS'
+  SHOW_INDICATORS = '@@countryIndicator/SHOW_INDICATORS',
+  FETCH_SEARCH = "@@countryIndicator/FETCH_SEARCH",
+  SHOW_SEARCH = "@@countryIndicator/SHOW_SEARCH"
 }
 
 export interface CountryIndicatorState extends PaginationOptions {
@@ -19,6 +22,7 @@ export interface CountryIndicatorState extends PaginationOptions {
   readonly indicatorResults?: IndicatorResult
   readonly sources?: string[]
   readonly sourceResults?: SourceResult
+  readonly searchResults?: SearchResult
   readonly loading?: boolean
   readonly error?: ErrorOptions
 }
@@ -43,4 +47,17 @@ export interface FetchIndicatorsOptions extends PaginationOptions {
 export interface IndicatorResult extends Result<Indicator> {}
 export interface ShowIndicatorsOptions {
   readonly result: IndicatorResult
+}
+export interface FetchSearchOptions extends PaginationOptions {
+  source: string
+  indicators: string[]
+  countries: string[]
+}
+export interface SearchResult {
+  result: {value: number|string
+  variable: Concept[]}[]
+}
+export interface ShowSearchOptions extends ResultPagination{
+  readonly result:SearchResult
+
 }

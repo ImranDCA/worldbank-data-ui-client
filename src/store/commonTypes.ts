@@ -23,6 +23,12 @@ export interface Result<R extends ResultBase> {
 export interface ResultBase {
   id: string,
 }
+export interface ValuedResult extends ResultBase {
+  value: string
+}
+export interface  Concept extends ValuedResult {
+  concept: string
+}
 
 export interface PaginationOptions {
   page: number
@@ -33,7 +39,7 @@ export interface ResultPagination extends PaginationOptions {
   total: number
 }
 
-interface CountryProp extends ResultBase {
+export interface CountryProp extends ResultBase {
   value: string
   iso2code: string
 }
